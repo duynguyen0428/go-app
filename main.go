@@ -12,6 +12,7 @@ func main() {
 	port := os.Getenv("PORT")
 
 	http.HandleFunc("/", IndexHandler)
+	http.HandleFunc("/favicon.ico", NotFoundHandler)
 
 	http.ListenAndServe(port, nil)
 
@@ -32,5 +33,8 @@ func main() {
 }
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Print(w, "Hello There")
+}
+func NotFoundHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Print(w, "Hello There")
 }
