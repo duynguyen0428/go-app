@@ -97,10 +97,10 @@ func CreatUserHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		data, err := json.Marshal(users)
+		// data, err := json.Marshal(users)
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(data)
+		json.NewEncoder(w).Encode(users)
 		return
 	}
 }
