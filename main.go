@@ -32,6 +32,13 @@ type UserDAO struct {
 // var db *mgo.Database
 // var ENCRYPT_KEY string
 
+type ResponseParam struct {
+	user    User   `json:"user"`
+	users   []User `json:"users"`
+	err     string `json:"error'`
+	message string `json:"message"`
+}
+
 var (
 	ENCRYPT_KEY string
 	db          *mgo.Database
@@ -90,6 +97,7 @@ func FaviconHandler(w http.ResponseWriter, r *http.Request) {
 
 func CreatUserHandler(w http.ResponseWriter, r *http.Request) {
 	// fmt.Print(w, "Hello There")
+
 	var user User
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&user)
@@ -104,8 +112,15 @@ func CreatUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, er.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
+	response := ResponseParam{
+		message: "sucessfully",
+	}
+	// response.message = "sucessfully"
+	// w.Header().Set("Content-Type", "application/json")
+	// w.WriteHeader(http.StatusCreated)
+	// data , err := json.NewEncoder(w).Encode(data)
+
+	responseWithJson(w, http.StatusCreated, response)
 }
 
 func GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
@@ -116,10 +131,14 @@ func GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	responsedata := ResponseParam{
+		users: users,
+	}
 	// data, err := json.Marshal(users)
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(users)
+	// w.Header().Set("Content-Type", "application/json")
+	// json.NewEncoder(w).Encode(users)
+	responseWithJson(w, http.StatusOK, responsedata)
 	return
 }
 
@@ -138,9 +157,13 @@ func RemoveUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(user)
+	// w.Header().Set("Content-Type", "application/json")
+	// w.WriteHeader(http.StatusOK)
+	// json.NewEncoder(w).Encode(user)
+	responsedata := ResponseParam{
+		message: "removed",
+	}
+	responseWithJson(w, http.StatusOK, responsedata)
 	return
 }
 
@@ -195,4 +218,11 @@ func comparePasswords(hashedPwd string, plainPwd []byte) bool {
 	}
 
 	return true
+}
+
+func responseWithJson(w http.ResponseWriter, reponsecode int, i interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(i)
+	return
 }
