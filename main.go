@@ -9,6 +9,7 @@ import (
 	// _ "github.com/heroku/x/hmetrics/onload"
 
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // <=============== Model ========================>
@@ -84,8 +85,22 @@ func CreatUserHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, er.Error(), http.StatusInternalServerError)
 			return
 		}
-
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
+		return
+	}
+
+	if r.Method == "GET" {
+		err, users := findAllUsers()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		data, err := json.Marshal(users)
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(data)
 		return
 	}
 }
@@ -104,6 +119,12 @@ func CreatUserHandler(w http.ResponseWriter, r *http.Request) {
 func insertUser(user User) error {
 	err := db.C(COLLECTION).Insert(&user)
 	return err
+}
+
+func findAllUsers() (error, []User) {
+	var users []User
+	err := db.C(COLLECTION).Find(bson.M{}).All(&users)
+	return err, users
 }
 
 // <=============== DAO ========================>
