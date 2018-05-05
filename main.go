@@ -40,9 +40,8 @@ var (
 
 const (
 	COLLECTION = "user"
-	// SERVER     = "mongodb://duynguyen0428:cuongduy0428@ds221228.mlab.com:21228/todoapp"
-	DATABASE = "todoapp"
-	cost     = 10
+	DATABASE   = "todoapp"
+	cost       = 10
 )
 
 func init() {
