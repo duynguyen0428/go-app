@@ -171,7 +171,7 @@ func removeUser(user *User) error {
 	return err
 }
 
-func findUserByEmail(email string) User {
+func findUserByEmail(email string) (error, User) {
 	var user User
 	err := db.C(COLLECTION).Find(bson.M{"Email": email}).One(&user)
 	return err, user
