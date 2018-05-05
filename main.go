@@ -19,7 +19,7 @@ import (
 // User: user model
 type User struct {
 	Email    string `json:"email"`
-	Password []byte] `json:"password"`
+	Password string `json:"password"`
 }
 
 type UserDAO struct {
@@ -41,7 +41,7 @@ const (
 	COLLECTION = "user"
 	SERVER     = "mongodb://duynguyen0428:cuongduy0428@ds221228.mlab.com:21228/todoapp"
 	DATABASE   = "todoapp"
-	cost = 10
+	cost       = 10
 )
 
 func init() {
@@ -96,8 +96,8 @@ func CreatUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	pwd := user.Password
-	hassPassword, err := bcrypt.GenerateFromPassword(pwd,cost)
-	user.Password = hassPassword
+	hassPassword, err := bcrypt.GenerateFromPassword(pwd, cost)
+	user.Password = string(hassPassword)
 	if er := insertUser(user); er != nil {
 		http.Error(w, er.Error(), http.StatusInternalServerError)
 		return
