@@ -123,15 +123,15 @@ func GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func RemoveUserHandler(w http.ResponseWriter, r *http.Request) {
-	emailvar := mux.Vars(r)
+	vars := mux.Vars(r)
 
-	err, user := findUserByEmail(emailvar)
+	err, user := findUserByEmail(vars["email"])
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err := removeUser(&user)
+	err = removeUser(&user)
 	// data, err := json.Marshal(users)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -139,7 +139,7 @@ func RemoveUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(users)
+	json.NewEncoder(w).Encode(user)
 	return
 }
 
@@ -166,7 +166,6 @@ func findAllUsers() (error, []User) {
 }
 
 func removeUser(user *User) error {
-	var users []User
 	err := db.C(COLLECTION).Remove(user)
 	return err
 }
