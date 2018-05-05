@@ -95,7 +95,9 @@ func CreatUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	user.Password,err := bcrypt.GenerateFromPassword(user.Password,cost)
+	pwd := user.Password
+	hassPassword, err := bcrypt.GenerateFromPassword(pwd,cost)
+	user.Password = hassPassword
 	if er := insertUser(user); er != nil {
 		http.Error(w, er.Error(), http.StatusInternalServerError)
 		return
