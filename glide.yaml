@@ -1,2 +1,3 @@
 package: web_dev/heroku-app
-import: []
+import:
+- package: gopkg.in/mgo.v2

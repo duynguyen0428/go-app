@@ -1,4 +1,11 @@
-hash: 196d3f86e1952e3dc28da720e4d993e0c0d9126021bb41e08c49c7575e207d1a
-updated: 2018-05-04T20:43:46.401449-07:00
-imports: []
+hash: 504f248a27805efd3d6a18fa36e365b05e1c6aaca7269bfb4a6b3e35a779644b
+updated: 2018-05-04T21:22:21.435255-07:00
+imports:
+- name: gopkg.in/mgo.v2
+  version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
+  subpackages:
+  - bson
+  - internal/json
+  - internal/sasl
+  - internal/scram
 testImports: []
