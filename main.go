@@ -8,11 +8,16 @@ import (
 	// _ "github.com/heroku/x/hmetrics/onload"
 )
 
+type User struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 func main() {
 	port := os.Getenv("PORT")
 
 	http.HandleFunc("/", IndexHandler)
-	http.HandleFunc("/favicon.ico", NotFoundHandler)
+	http.HandleFunc("/favicon.ico", FaviconHandler)
 
 	http.ListenAndServe(port, nil)
 
