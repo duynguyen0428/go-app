@@ -19,7 +19,7 @@ func main() {
 	http.HandleFunc("/", IndexHandler)
 	http.HandleFunc("/favicon.ico", FaviconHandler)
 
-	http.ListenAndServe(port, nil)
+	http.ListenAndServe(":"+port, nil)
 
 	// if port == "" {
 	// 	log.Fatal("$PORT must be set")
