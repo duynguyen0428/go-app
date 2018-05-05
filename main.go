@@ -9,6 +9,7 @@ import (
 	// _ "github.com/heroku/x/hmetrics/onload"
 
 	"github.com/gorilla/mux"
+	"golang.org/x/crypto/bcrypt"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -28,15 +29,24 @@ type UserDAO struct {
 
 // <=============== Model ========================>
 
-var db *mgo.Database
+// var db *mgo.Database
+// var ENCRYPT_KEY string
+
+var (
+	ENCRYPT_KEY string
+	db          *mgo.Database
+)
 
 const (
 	COLLECTION = "user"
 	SERVER     = "mongodb://duynguyen0428:cuongduy0428@ds221228.mlab.com:21228/todoapp"
 	DATABASE   = "todoapp"
+	cost = 10
 )
 
 func init() {
+	ENCRYPT_KEY = os.Getenv("ENCRYPT_KEY")
+
 	session, err := mgo.Dial(SERVER)
 	if err != nil {
 		log.Fatal(err)
@@ -85,7 +95,7 @@ func CreatUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
+	user.Password,err := bcrypt.GenerateFromPassword(user.Password,cost)
 	if er := insertUser(user); er != nil {
 		http.Error(w, er.Error(), http.StatusInternalServerError)
 		return

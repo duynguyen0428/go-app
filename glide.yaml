@@ -3,3 +3,6 @@ import:
 - package: gopkg.in/mgo.v2
 - package: github.com/gorilla/mux
   version: ^1.6.1
+- package: golang.org/x/crypto
+  subpackages:
+  - bcrypt
