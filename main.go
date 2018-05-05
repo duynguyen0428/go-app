@@ -1,17 +1,14 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 	"os"
 	// "github.com/gin-gonic/gin"
 	// _ "github.com/heroku/x/hmetrics/onload"
-)
 
-type User struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
+	model "./model"
+)
 
 func main() {
 	port := os.Getenv("PORT")
@@ -38,7 +35,15 @@ func main() {
 }
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Print(w, "Hello There")
+	// fmt.Print(w, "Hello There")
+	user := model.User{"test@mail.com", "123456"}
+	data, err := json.Marshal(user)
+	if err != nil {
+		http.Error(w, "error", http.StatusBadRequest)
+		return
+	}
+	w.WriteHeader(http.StatusAccepted)
+	w.Write(data)
 }
 func FaviconHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./favicon.ico")
