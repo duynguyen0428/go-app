@@ -8,6 +8,12 @@ import (
 	// _ "github.com/heroku/x/hmetrics/onload"
 )
 
+// User: user model
+type User struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 func main() {
 	port := os.Getenv("PORT")
 
