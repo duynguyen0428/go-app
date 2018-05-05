@@ -35,17 +35,19 @@ type UserDAO struct {
 var (
 	ENCRYPT_KEY string
 	db          *mgo.Database
+	SERVER      string
 )
 
 const (
 	COLLECTION = "user"
-	SERVER     = "mongodb://duynguyen0428:cuongduy0428@ds221228.mlab.com:21228/todoapp"
-	DATABASE   = "todoapp"
-	cost       = 10
+	// SERVER     = "mongodb://duynguyen0428:cuongduy0428@ds221228.mlab.com:21228/todoapp"
+	DATABASE = "todoapp"
+	cost     = 10
 )
 
 func init() {
 	ENCRYPT_KEY = os.Getenv("ENCRYPT_KEY")
+	SERVER = os.Getenv("MLAB_URL")
 
 	session, err := mgo.Dial(SERVER)
 	if err != nil {
@@ -130,11 +132,6 @@ func RemoveUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	// err, user := findUserByEmail(vars["email"])
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 	return
-	// }
 
 	err = removeUser(&user)
 	// data, err := json.Marshal(users)
