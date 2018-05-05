@@ -35,6 +35,6 @@ func main() {
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Print(w, "Hello There")
 }
-func NotFoundHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Print(w, "Hello There")
+func FaviconHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./favicon.ico")
 }
