@@ -6,8 +6,6 @@ import (
 	"os"
 	// "github.com/gin-gonic/gin"
 	// _ "github.com/heroku/x/hmetrics/onload"
-
-	model "./model"
 )
 
 func main() {
@@ -36,7 +34,7 @@ func main() {
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	// fmt.Print(w, "Hello There")
-	user := model.User{"test@mail.com", "123456"}
+	user := User{"test@mail.com", "123456"}
 	data, err := json.Marshal(user)
 	if err != nil {
 		http.Error(w, "error", http.StatusBadRequest)
