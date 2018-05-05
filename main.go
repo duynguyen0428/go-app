@@ -44,7 +44,7 @@ func init() {
 func main() {
 	port := os.Getenv("PORT")
 
-	http.HandleFunc("/user", IndexHandler)
+	http.HandleFunc("/", IndexHandler)
 	http.HandleFunc("/favicon.ico", FaviconHandler)
 	http.HandleFunc("/user", CreatUserHandler)
 
