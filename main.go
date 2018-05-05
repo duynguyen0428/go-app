@@ -120,7 +120,7 @@ func CreatUserHandler(w http.ResponseWriter, r *http.Request) {
 	// w.WriteHeader(http.StatusCreated)
 	// data , err := json.NewEncoder(w).Encode(data)
 
-	responseWithJson(w, http.StatusCreated, &response)
+	responseWithJson(w, http.StatusCreated, response)
 }
 
 func GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
@@ -138,7 +138,7 @@ func GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 
 	// w.Header().Set("Content-Type", "application/json")
 	// json.NewEncoder(w).Encode(users)
-	responseWithJson(w, http.StatusOK, &responsedata)
+	responseWithJson(w, http.StatusOK, responsedata)
 	return
 }
 
@@ -163,7 +163,7 @@ func RemoveUserHandler(w http.ResponseWriter, r *http.Request) {
 	responsedata := ResponseParam{
 		message: "removed",
 	}
-	responseWithJson(w, http.StatusOK, &responsedata)
+	responseWithJson(w, http.StatusOK, responsedata)
 	return
 }
 
@@ -220,9 +220,11 @@ func comparePasswords(hashedPwd string, plainPwd []byte) bool {
 	return true
 }
 
-func responseWithJson(w http.ResponseWriter, reponsecode int, i *ResponseParam) {
+func responseWithJson(w http.ResponseWriter, reponsecode int, i interface{}) {
+	response, _ := json.Marshal(i)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(i)
+	// json.NewEncoder(w).Encode(i)
+	w.Write(response)
 	return
 }
