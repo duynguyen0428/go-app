@@ -19,7 +19,7 @@ import (
 // User: user model
 type User struct {
 	Email    string `json:"email"`
-	Password string `json:"password"`
+	Password []byte] `json:"password"`
 }
 
 type UserDAO struct {
