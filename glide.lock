@@ -1,6 +1,8 @@
-hash: 504f248a27805efd3d6a18fa36e365b05e1c6aaca7269bfb4a6b3e35a779644b
-updated: 2018-05-04T21:22:21.435255-07:00
+hash: ed6e08d2387cb76b6b7d8561784b397a38e867115b7fd3da64940b874b9bad5b
+updated: 2018-05-04T21:51:51.350381-07:00
 imports:
+- name: github.com/gorilla/mux
+  version: 53c1911da2b537f792e7cafcb446b05ffe33b996
 - name: gopkg.in/mgo.v2
   version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
   subpackages:

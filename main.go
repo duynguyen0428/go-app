@@ -8,6 +8,8 @@ import (
 	// "github.com/gin-gonic/gin"
 	// _ "github.com/heroku/x/hmetrics/onload"
 
+	"github.com/gorilla/mux"
+
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -45,11 +47,16 @@ func init() {
 func main() {
 	port := os.Getenv("PORT")
 
-	http.HandleFunc("/", IndexHandler)
-	http.HandleFunc("/favicon.ico", FaviconHandler)
-	http.HandleFunc("/user", CreatUserHandler)
+	router := mux.NewRouter()
 
-	http.ListenAndServe(":"+port, nil)
+	router.Methods("GET").Path("/user").HandlerFunc(GetAllUsersHandler)
+	router.Methods("POST").Path("/user").HandlerFunc(CreatUserHandler)
+
+	// http.HandleFunc("/", IndexHandler)
+	// http.HandleFunc("/favicon.ico", FaviconHandler)
+	// http.HandleFunc("/user", CreatUserHandler)
+
+	http.ListenAndServe(":"+port, router)
 
 }
 
@@ -71,38 +78,35 @@ func FaviconHandler(w http.ResponseWriter, r *http.Request) {
 
 func CreatUserHandler(w http.ResponseWriter, r *http.Request) {
 	// fmt.Print(w, "Hello There")
-
-	if r.Method == "POST" {
-		var user User
-		decoder := json.NewDecoder(r.Body)
-		err := decoder.Decode(&user)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		if er := insertUser(user); er != nil {
-			http.Error(w, er.Error(), http.StatusInternalServerError)
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
+	var user User
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&user)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if r.Method == "GET" {
-		err, users := findAllUsers()
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		// data, err := json.Marshal(users)
-
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(users)
+	if er := insertUser(user); er != nil {
+		http.Error(w, er.Error(), http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+}
+
+func GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
+	// fmt.Print(w, "Hello There")
+	err, users := findAllUsers()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// data, err := json.Marshal(users)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(users)
+	return
 }
 
 // <=============== Handlers ========================>
