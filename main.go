@@ -61,7 +61,7 @@ func main() {
 
 	router.Methods("GET").Path("/user").HandlerFunc(GetAllUsersHandler)
 	router.Methods("POST").Path("/user").HandlerFunc(CreatUserHandler)
-	router.Methods("DELETE").Path("/user/{email}").HandlerFunc(RemoveUserHandler)
+	router.Methods("DELETE").Path("/user").HandlerFunc(RemoveUserHandler)
 
 	// http.HandleFunc("/", IndexHandler)
 	// http.HandleFunc("/favicon.ico", FaviconHandler)
@@ -123,13 +123,18 @@ func GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func RemoveUserHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-
-	err, user := findUserByEmail(vars["email"])
+	var user User
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&user)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	// err, user := findUserByEmail(vars["email"])
+	// if err != nil {
+	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+	// 	return
+	// }
 
 	err = removeUser(&user)
 	// data, err := json.Marshal(users)
