@@ -61,6 +61,7 @@ func main() {
 
 	router.Methods("GET").Path("/user").HandlerFunc(GetAllUsersHandler)
 	router.Methods("POST").Path("/user").HandlerFunc(CreatUserHandler)
+	router.Methods("DELETE").Path("/user/{email}").HandlerFunc(RemoveUserHandler)
 
 	// http.HandleFunc("/", IndexHandler)
 	// http.HandleFunc("/favicon.ico", FaviconHandler)
@@ -121,6 +122,27 @@ func GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func RemoveUserHandler(w http.ResponseWriter, r *http.Request) {
+	emailvar := mux.Vars(r)
+
+	err, user := findUserByEmail(emailvar)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err := removeUser(&user)
+	// data, err := json.Marshal(users)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(users)
+	return
+}
+
 // <=============== Handlers ========================>
 
 // <=============== DAO ========================>
@@ -143,8 +165,34 @@ func findAllUsers() (error, []User) {
 	return err, users
 }
 
+func removeUser(user *User) error {
+	var users []User
+	err := db.C(COLLECTION).Remove(user)
+	return err
+}
+
+func findUserByEmail(email string) User {
+	var user User
+	err := db.C(COLLECTION).Find(bson.M{"Email": email}).One(&user)
+	return err, user
+}
+
 // <=============== DAO ========================>
 
 // <=============== Database ========================>
 
 // <=============== Database ========================>
+
+// <=============== Ultility Functions ========================>
+func comparePasswords(hashedPwd string, plainPwd []byte) bool {
+	// Since we'll be getting the hashed password from the DB it
+	// will be a string so we'll need to convert it to a byte slice
+	byteHash := []byte(hashedPwd)
+	err := bcrypt.CompareHashAndPassword(byteHash, plainPwd)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+
+	return true
+}
