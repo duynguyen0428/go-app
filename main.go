@@ -66,7 +66,7 @@ func main() {
 	port := os.Getenv("PORT")
 
 	router := mux.NewRouter()
-
+	router.Methods("GET").Path("/").HandlerFunc(IndexHandler)
 	router.Methods("GET").Path("/user").HandlerFunc(GetAllUsersHandler)
 	router.Methods("POST").Path("/user").HandlerFunc(CreatUserHandler)
 	router.Methods("DELETE").Path("/user").HandlerFunc(RemoveUserHandler)
