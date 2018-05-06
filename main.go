@@ -143,9 +143,9 @@ func GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	// data, err := json.Marshal(users)
 
 	fmt.Println("users: ", users)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(users)
-	// responseWithJson(w, http.StatusOK, users)
+	// w.Header().Set("Content-Type", "application/json")
+	// json.NewEncoder(w).Encode(users)
+	responseWithJson(w, http.StatusOK, users)
 	return
 }
 
