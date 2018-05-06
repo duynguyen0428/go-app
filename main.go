@@ -212,10 +212,10 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 
 	// isMatch := comparePasswords(user.Password, pwd)
 
-	if isMatch == false {
-		responseWithJson(w, http.StatusUnauthorized, map[string]string{"message": "incorrect passwod"})
-		return
-	}
+	// if isMatch == false {
+	// 	responseWithJson(w, http.StatusUnauthorized, map[string]string{"message": "incorrect passwod"})
+	// 	return
+	// }
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": user.Email,
