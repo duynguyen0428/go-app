@@ -75,7 +75,11 @@ func main() {
 	// http.HandleFunc("/favicon.ico", FaviconHandler)
 	// http.HandleFunc("/user", CreatUserHandler)
 
-	http.ListenAndServe(":"+port, router)
+	if port != nil {
+		http.ListenAndServe(":"+port, router)
+	} else {
+		http.ListenAndServe(":8000", router)
+	}
 
 }
 
@@ -131,9 +135,9 @@ func GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responsedata := ResponseParam{
-		users: users,
-	}
+	// responsedata := ResponseParam{
+	// 	users: users,
+	// }
 	// data, err := json.Marshal(users)
 
 	w.Header().Set("Content-Type", "application/json")
