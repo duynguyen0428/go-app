@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -11,6 +12,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
+
+	jwt "github.com/dgrijalva/jwt-go"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -71,6 +74,7 @@ func main() {
 	router.Methods("GET").Path("/user").HandlerFunc(GetAllUsersHandler)
 	router.Methods("POST").Path("/user").HandlerFunc(CreatUserHandler)
 	router.Methods("DELETE").Path("/user").HandlerFunc(RemoveUserHandler)
+	router.Methods("POST").Path("/signin").HandlerFunc(SignInHandler)
 
 	// http.HandleFunc("/", IndexHandler)
 	// http.HandleFunc("/favicon.ico", FaviconHandler)
@@ -137,14 +141,7 @@ func GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// responsedata := ResponseParam{
-	// 	users: users,
-	// }
-	// data, err := json.Marshal(users)
-
 	fmt.Println("users: ", users)
-	// w.Header().Set("Content-Type", "application/json")
-	// json.NewEncoder(w).Encode(users)
 	responseWithJson(w, http.StatusOK, users)
 	return
 }
@@ -164,14 +161,59 @@ func RemoveUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	// w.Header().Set("Content-Type", "application/json")
-	// w.WriteHeader(http.StatusOK)
-	// json.NewEncoder(w).Encode(user)
-	// responsedata := ResponseParam{
-	// 	message: "removed",
-	// }
+
 	responseWithJson(w, http.StatusOK, map[string]string{"message": "removed"})
 	return
+}
+
+func SignInHandler(w http.ResponseWriter, r *http.Request) {
+
+	data := make(map[string]interface{})
+
+	b, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	// unmarschal JSON
+	err = json.Unmarshal(b, &data)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	email := data["email"].(string)
+
+	err, user := findUserByEmail(email)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	pwd := []byte(data["password"].(string))
+
+	isMatch := comparePasswords(user.Password, pwd)
+
+	if isMatch == false {
+		responseWithJson(w, http.StatusUnauthorized, map[string]string{"message": "incorrect passwod"})
+		return
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"username": user.Email,
+	})
+
+	tokenString, error := token.SignedString([]byte("secret"))
+	if error != nil {
+		fmt.Println(error)
+	}
+	// json.NewEncoder(w).Encode(JwtToken{Token: tokenString})
+
+	responseWithJson(w, http.StatusOK, map[string]string{"token": tokenString})
+
 }
 
 // <=============== Handlers ========================>
