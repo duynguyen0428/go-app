@@ -120,7 +120,7 @@ func CreatUserHandler(w http.ResponseWriter, r *http.Request) {
 	// w.WriteHeader(http.StatusCreated)
 	// data , err := json.NewEncoder(w).Encode(data)
 
-	responseWithJson(w, http.StatusCreated, response)
+	responseWithJson(w, http.StatusCreated, map[string]string{"message": "succesful"})
 }
 
 func GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
@@ -138,7 +138,7 @@ func GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 
 	// w.Header().Set("Content-Type", "application/json")
 	// json.NewEncoder(w).Encode(users)
-	responseWithJson(w, http.StatusOK, responsedata)
+	responseWithJson(w, http.StatusOK, users)
 	return
 }
 
@@ -163,7 +163,7 @@ func RemoveUserHandler(w http.ResponseWriter, r *http.Request) {
 	responsedata := ResponseParam{
 		message: "removed",
 	}
-	responseWithJson(w, http.StatusOK, responsedata)
+	responseWithJson(w, http.StatusOK, map[string]string{"message": "removed"})
 	return
 }
 
