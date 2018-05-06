@@ -206,7 +206,8 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Fatalln("user from find user: ", user)
 
-	pwd := data["password"].(string)
+	pwd := data["password"]
+
 	log.Fatalln("password from request: ", pwd)
 
 	isMatch := comparePasswords(user.Password, pwd)
