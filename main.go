@@ -210,7 +210,7 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Fatalln("password from request: ", pwd)
 
-	isMatch := comparePasswords(user.Password, pwd)
+	// isMatch := comparePasswords(user.Password, pwd)
 
 	if isMatch == false {
 		responseWithJson(w, http.StatusUnauthorized, map[string]string{"message": "incorrect passwod"})
