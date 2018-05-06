@@ -20,11 +20,11 @@ import (
 )
 
 // <=============== Model ========================>
-// User: user model
-type User struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
+// // User: user model
+// type User struct {
+// 	Email    string `json:"email"`
+// 	Password string `json:"password"`
+// }
 
 type UserDAO struct {
 	Server   string
