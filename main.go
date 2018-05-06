@@ -125,7 +125,7 @@ func CreatUserHandler(w http.ResponseWriter, r *http.Request) {
 	// w.Header().Set("Content-Type", "application/json")
 	// w.WriteHeader(http.StatusCreated)
 	// data , err := json.NewEncoder(w).Encode(data)
-	fmt.Println("user: " + user)
+	fmt.Println("user: ", user)
 	responseWithJson(w, http.StatusCreated, map[string]string{"message": "succesful"})
 }
 
@@ -142,7 +142,7 @@ func GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	// }
 	// data, err := json.Marshal(users)
 
-	fmt.Println("users: " + users)
+	fmt.Println("users: ", users)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(users)
 	// responseWithJson(w, http.StatusOK, users)
