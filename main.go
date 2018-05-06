@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -74,12 +75,13 @@ func main() {
 	// http.HandleFunc("/", IndexHandler)
 	// http.HandleFunc("/favicon.ico", FaviconHandler)
 	// http.HandleFunc("/user", CreatUserHandler)
+	http.ListenAndServe(":"+port, router)
 
-	if port != nil {
-		http.ListenAndServe(":"+port, router)
-	} else {
-		http.ListenAndServe(":8000", router)
-	}
+	// if port != "" {
+	// 	http.ListenAndServe(":"+port, router)
+	// } else {
+	// 	http.ListenAndServe(":8000", router)
+	// }
 
 }
 
@@ -116,14 +118,14 @@ func CreatUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, er.Error(), http.StatusInternalServerError)
 		return
 	}
-	response := ResponseParam{
-		message: "sucessfully",
-	}
+	// response := ResponseParam{
+	// 	message: "sucessfully",
+	// }
 	// response.message = "sucessfully"
 	// w.Header().Set("Content-Type", "application/json")
 	// w.WriteHeader(http.StatusCreated)
 	// data , err := json.NewEncoder(w).Encode(data)
-
+	fmt.Println("user: " + user)
 	responseWithJson(w, http.StatusCreated, map[string]string{"message": "succesful"})
 }
 
@@ -140,6 +142,7 @@ func GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	// }
 	// data, err := json.Marshal(users)
 
+	fmt.Println("users: " + users)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(users)
 	// responseWithJson(w, http.StatusOK, users)
@@ -164,9 +167,9 @@ func RemoveUserHandler(w http.ResponseWriter, r *http.Request) {
 	// w.Header().Set("Content-Type", "application/json")
 	// w.WriteHeader(http.StatusOK)
 	// json.NewEncoder(w).Encode(user)
-	responsedata := ResponseParam{
-		message: "removed",
-	}
+	// responsedata := ResponseParam{
+	// 	message: "removed",
+	// }
 	responseWithJson(w, http.StatusOK, map[string]string{"message": "removed"})
 	return
 }
