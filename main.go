@@ -186,14 +186,16 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	email := data["email"].(string)
-
+	fmt.Println("email from request: ", email)
 	err, user := findUserByEmail(email)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
+	fmt.Println("user from find user: ", user)
 
 	pwd := []byte(data["password"].(string))
+	fmt.Println("password from request: ", pwd)
 
 	isMatch := comparePasswords(user.Password, pwd)
 
@@ -205,11 +207,13 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": user.Email,
 	})
+	fmt.Println("token from request: ", token)
 
 	tokenString, error := token.SignedString([]byte("secret"))
 	if error != nil {
 		fmt.Println(error)
 	}
+	fmt.Println("token string from request: ", tokenString)
 	// json.NewEncoder(w).Encode(JwtToken{Token: tokenString})
 
 	responseWithJson(w, http.StatusOK, map[string]string{"token": tokenString})
