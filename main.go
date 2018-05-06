@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -47,6 +47,8 @@ var (
 	ENCRYPT_KEY string
 	db          *mgo.Database
 	SERVER      string
+
+	Info *log.Logger
 )
 
 const (
@@ -55,9 +57,13 @@ const (
 	cost       = 10
 )
 
-func init() {
+func Init(infoHandle io.Writer) {
 	ENCRYPT_KEY = os.Getenv("ENCRYPT_KEY")
-	SERVER = os.Getenv("MLAB_URL")
+	// SERVER = os.Getenv("MLAB_URL")
+	SERVER = "mongodb://duynguyen0428:cuongduy0428@ds221228.mlab.com:21228/todoapp"
+	Info = log.New(infoHandle,
+		"INFO: ",
+		log.Ldate|log.Ltime|log.Lshortfile)
 
 	session, err := mgo.Dial(SERVER)
 	if err != nil {
@@ -67,7 +73,8 @@ func init() {
 }
 
 func main() {
-	port := os.Getenv("PORT")
+
+	Init(os.Stdout)
 
 	router := mux.NewRouter()
 	router.Methods("GET").Path("/").HandlerFunc(IndexHandler)
@@ -79,7 +86,9 @@ func main() {
 	// http.HandleFunc("/", IndexHandler)
 	// http.HandleFunc("/favicon.ico", FaviconHandler)
 	// http.HandleFunc("/user", CreatUserHandler)
+	port := os.Getenv("PORT")
 	http.ListenAndServe(":"+port, router)
+	// http.ListenAndServe(":8000", router)
 
 	// if port != "" {
 	// 	http.ListenAndServe(":"+port, router)
@@ -129,7 +138,7 @@ func CreatUserHandler(w http.ResponseWriter, r *http.Request) {
 	// w.Header().Set("Content-Type", "application/json")
 	// w.WriteHeader(http.StatusCreated)
 	// data , err := json.NewEncoder(w).Encode(data)
-	fmt.Println("user: ", user)
+	log.Fatalln("user: ", user)
 	responseWithJson(w, http.StatusCreated, map[string]string{"message": "succesful"})
 }
 
@@ -141,7 +150,7 @@ func GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("users: ", users)
+	log.Fatalln("users: ", users)
 	responseWithJson(w, http.StatusOK, users)
 	return
 }
@@ -186,16 +195,19 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	email := data["email"].(string)
-	fmt.Println("email from request: ", email)
+	Info.Println("email from request: ", email)
 	err, user := findUserByEmail(email)
 	if err != nil {
+		panic(err.Error())
+		Info.Println("error from find user by email: ", err.Error())
+		Info.Println("error from find user by email: ", err.Error())
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	fmt.Println("user from find user: ", user)
+	log.Fatalln("user from find user: ", user)
 
 	pwd := []byte(data["password"].(string))
-	fmt.Println("password from request: ", pwd)
+	log.Fatalln("password from request: ", pwd)
 
 	isMatch := comparePasswords(user.Password, pwd)
 
@@ -207,13 +219,13 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": user.Email,
 	})
-	fmt.Println("token from request: ", token)
+	log.Fatalln("token from request: ", token)
 
 	tokenString, error := token.SignedString([]byte("secret"))
 	if error != nil {
-		fmt.Println(error)
+		log.Fatalln(error)
 	}
-	fmt.Println("token string from request: ", tokenString)
+	log.Fatalln("token string from request: ", tokenString)
 	// json.NewEncoder(w).Encode(JwtToken{Token: tokenString})
 
 	responseWithJson(w, http.StatusOK, map[string]string{"token": tokenString})
@@ -248,8 +260,10 @@ func removeUser(user *User) error {
 }
 
 func findUserByEmail(email string) (error, User) {
+	log.Fatalln("email passed ", email)
 	var user User
 	err := db.C(COLLECTION).Find(bson.M{"Email": email}).One(&user)
+	log.Fatalln("Find user: ", user)
 	return err, user
 }
 
