@@ -206,7 +206,7 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Fatalln("user from find user: ", user)
 
-	pwd := []byte(data["password"].(string))
+	pwd := data["password"].(string)
 	log.Fatalln("password from request: ", pwd)
 
 	isMatch := comparePasswords(user.Password, pwd)
@@ -274,11 +274,12 @@ func findUserByEmail(email string) (error, User) {
 // <=============== Database ========================>
 
 // <=============== Ultility Functions ========================>
-func comparePasswords(hashedPwd string, plainPwd []byte) bool {
+func comparePasswords(hashedPwd string, plainPwd string) bool {
 	// Since we'll be getting the hashed password from the DB it
 	// will be a string so we'll need to convert it to a byte slice
+	bytePwd := []byte(plainPwd)
 	byteHash := []byte(hashedPwd)
-	err := bcrypt.CompareHashAndPassword(byteHash, plainPwd)
+	err := bcrypt.CompareHashAndPassword(byteHash, bytePwd)
 	if err != nil {
 		log.Println(err)
 		return false
