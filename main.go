@@ -59,8 +59,8 @@ const (
 
 func Init(infoHandle io.Writer) {
 	ENCRYPT_KEY = os.Getenv("ENCRYPT_KEY")
-	// SERVER = os.Getenv("MLAB_URL")
-	SERVER = "mongodb://duynguyen0428:cuongduy0428@ds221228.mlab.com:21228/todoapp"
+	SERVER = os.Getenv("MLAB_URL")
+	// SERVER = "mongodb://duynguyen0428:cuongduy0428@ds221228.mlab.com:21228/todoapp"
 	Info = log.New(infoHandle,
 		"INFO: ",
 		log.Ldate|log.Ltime|log.Lshortfile)
@@ -260,10 +260,10 @@ func removeUser(user *User) error {
 }
 
 func findUserByEmail(email string) (error, User) {
-	log.Fatalln("email passed ", email)
+	Info.Println("email passed ", email)
 	var user User
-	err := db.C(COLLECTION).Find(bson.M{"Email": email}).One(&user)
-	log.Fatalln("Find user: ", user)
+	err := db.C(COLLECTION).Find(bson.M{"email": email}).One(&user)
+	Info.Println("Find user: ", user)
 	return err, user
 }
 
