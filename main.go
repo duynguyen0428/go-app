@@ -19,7 +19,7 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 
-	. "./heroku-app/model"
+	. "heroku-app/model"
 )
 
 // <=============== Model ========================>
