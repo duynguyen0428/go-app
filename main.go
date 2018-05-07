@@ -207,7 +207,7 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// log.Fatalln("user from find user: ", user)
 
-	pwd := data["password"].([]byte)
+	pwd := data["password"].(string)
 
 	fmt.Println("password from request: ", pwd)
 
