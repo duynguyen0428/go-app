@@ -211,23 +211,23 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("password from request: ", pwd)
 
-	// isMatch := comparePasswords(user.Password, pwd)
+	isMatch := comparePasswords(user.Password, pwd)
 
-	// if isMatch == false {
-	// 	responseWithJson(w, http.StatusUnauthorized, map[string]string{"message": "incorrect passwod"})
-	// 	return
-	// }
+	if isMatch == false {
+		responseWithJson(w, http.StatusUnauthorized, map[string]string{"message": "incorrect passwod"})
+		return
+	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": user.Email,
 	})
-	log.Fatalln("token from request: ", token)
+	// log.Fatalln("token from request: ", token)
 
 	tokenString, error := token.SignedString([]byte("secret"))
 	if error != nil {
-		log.Fatalln(error)
+		fmt.Fatalln(error)
 	}
-	log.Fatalln("token string from request: ", tokenString)
+	fmt.Fatalln("token string from request: ", tokenString)
 	// json.NewEncoder(w).Encode(JwtToken{Token: tokenString})
 
 	responseWithJson(w, http.StatusOK, map[string]string{"token": tokenString})
@@ -265,7 +265,7 @@ func findUserByEmail(email string) (error, User) {
 	// Info.Println("email passed ", email)
 	var user User
 	err := db.C(COLLECTION).Find(bson.M{"email": email}).One(&user)
-	// Info.Println("Find user: ", user)
+	fmt.Println("Find user: ", user)
 	return err, user
 }
 
