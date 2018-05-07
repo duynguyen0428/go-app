@@ -262,10 +262,10 @@ func removeUser(user *User) error {
 }
 
 func findUserByEmail(email string) (error, User) {
-	Info.Println("email passed ", email)
+	// Info.Println("email passed ", email)
 	var user User
 	err := db.C(COLLECTION).Find(bson.M{"email": email}).One(&user)
-	Info.Println("Find user: ", user)
+	// Info.Println("Find user: ", user)
 	return err, user
 }
 
