@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -204,11 +205,11 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	log.Fatalln("user from find user: ", user)
+	// log.Fatalln("user from find user: ", user)
 
 	pwd := data["password"].([]byte)
 
-	log.Fatalln("password from request: ", pwd)
+	fmt.Println("password from request: ", pwd)
 
 	// isMatch := comparePasswords(user.Password, pwd)
 
