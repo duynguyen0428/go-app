@@ -225,9 +225,9 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 
 	tokenString, error := token.SignedString([]byte("secret"))
 	if error != nil {
-		fmt.Fatalln(error)
+		fmt.Println(error)
 	}
-	fmt.Fatalln("token string from request: ", tokenString)
+	fmt.Println("token string from request: ", tokenString)
 	// json.NewEncoder(w).Encode(JwtToken{Token: tokenString})
 
 	responseWithJson(w, http.StatusOK, map[string]string{"token": tokenString})
