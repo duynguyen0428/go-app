@@ -150,7 +150,7 @@ func GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Fatalln("users: ", users)
+	// log.Fatalln("users: ", users)
 	responseWithJson(w, http.StatusOK, users)
 	return
 }
