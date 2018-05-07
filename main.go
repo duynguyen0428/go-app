@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -14,7 +13,7 @@ import (
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
 
-	jwt "github.com/dgrijalva/jwt-go"
+	// jwt "github.com/dgrijalva/jwt-go"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -40,7 +39,7 @@ type UserDAO struct {
 type ResponseParam struct {
 	user    User   `json:"user"`
 	users   []User `json:"users"`
-	err     string `json:"error'`
+	err     string `json:"error"`
 	message string `json:"message"`
 }
 
@@ -80,8 +79,9 @@ func main() {
 	router := mux.NewRouter()
 	router.Methods("GET").Path("/").HandlerFunc(IndexHandler)
 	router.Methods("GET").Path("/user").HandlerFunc(GetAllUsersHandler)
-	router.Methods("POST").Path("/user").HandlerFunc(CreatUserHandler)
 	router.Methods("DELETE").Path("/user").HandlerFunc(RemoveUserHandler)
+
+	router.Methods("POST").Path("/register").HandlerFunc(CreatUserHandler)
 	router.Methods("POST").Path("/signin").HandlerFunc(SignInHandler)
 
 	// http.HandleFunc("/", IndexHandler)
@@ -115,124 +115,117 @@ func FaviconHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./favicon.ico")
 }
 
-func CreatUserHandler(w http.ResponseWriter, r *http.Request) {
-	// fmt.Print(w, "Hello There")
+// func CreatUserHandler(w http.ResponseWriter, r *http.Request) {
+// 	// fmt.Print(w, "Hello There")
 
-	var user User
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&user)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	pwd := []byte(user.Password)
-	hassPassword, err := bcrypt.GenerateFromPassword(pwd, cost)
-	user.Password = string(hassPassword)
-	if er := insertUser(user); er != nil {
-		http.Error(w, er.Error(), http.StatusInternalServerError)
-		return
-	}
-	// response := ResponseParam{
-	// 	message: "sucessfully",
-	// }
-	// response.message = "sucessfully"
-	// w.Header().Set("Content-Type", "application/json")
-	// w.WriteHeader(http.StatusCreated)
-	// data , err := json.NewEncoder(w).Encode(data)
-	log.Fatalln("user: ", user)
-	responseWithJson(w, http.StatusCreated, map[string]string{"message": "succesful"})
-}
+// 	var user User
+// 	decoder := json.NewDecoder(r.Body)
+// 	err := decoder.Decode(&user)
+// 	if err != nil {
+// 		http.Error(w, err.Error(), http.StatusBadRequest)
+// 		return
+// 	}
+// 	pwd := []byte(user.Password)
+// 	hassPassword, err := bcrypt.GenerateFromPassword(pwd, cost)
+// 	user.Password = string(hassPassword)
+// 	if er := insertUser(user); er != nil {
+// 		http.Error(w, er.Error(), http.StatusInternalServerError)
+// 		return
+// 	}
+// 	fmt.Println("user: ", user)
+// 	responseWithJson(w, http.StatusCreated, map[string]string{"message": "succesful"})
+// }
 
-func GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
-	// fmt.Print(w, "Hello There")
-	err, users := findAllUsers()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+// func GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
+// 	// fmt.Print(w, "Hello There")
+// 	err, users := findAllUsers()
+// 	if err != nil {
+// 		http.Error(w, err.Error(), http.StatusInternalServerError)
+// 		return
+// 	}
 
-	// log.Fatalln("users: ", users)
-	responseWithJson(w, http.StatusOK, users)
-	return
-}
+// 	// log.Fatalln("users: ", users)
+// 	responseWithJson(w, http.StatusOK, users)
+// 	return
+// }
 
-func RemoveUserHandler(w http.ResponseWriter, r *http.Request) {
-	var user User
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&user)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+// func RemoveUserHandler(w http.ResponseWriter, r *http.Request) {
+// 	var user User
+// 	decoder := json.NewDecoder(r.Body)
+// 	err := decoder.Decode(&user)
+// 	if err != nil {
+// 		http.Error(w, err.Error(), http.StatusBadRequest)
+// 		return
+// 	}
 
-	err = removeUser(&user)
-	// data, err := json.Marshal(users)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+// 	err = removeUser(&user)
+// 	// data, err := json.Marshal(users)
+// 	if err != nil {
+// 		http.Error(w, err.Error(), http.StatusInternalServerError)
+// 		return
+// 	}
 
-	responseWithJson(w, http.StatusOK, map[string]string{"message": "removed"})
-	return
-}
+// 	responseWithJson(w, http.StatusOK, map[string]string{"message": "removed"})
+// 	return
+// }
 
-func SignInHandler(w http.ResponseWriter, r *http.Request) {
+// func SignInHandler(w http.ResponseWriter, r *http.Request) {
 
-	data := make(map[string]interface{})
+// 	data := make(map[string]interface{})
 
-	b, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
+// 	b, err := ioutil.ReadAll(r.Body)
+// 	defer r.Body.Close()
+// 	if err != nil {
+// 		http.Error(w, err.Error(), 500)
+// 		return
+// 	}
 
-	// unmarschal JSON
-	err = json.Unmarshal(b, &data)
+// 	// unmarschal JSON
+// 	err = json.Unmarshal(b, &data)
 
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+// 	if err != nil {
+// 		http.Error(w, err.Error(), http.StatusBadRequest)
+// 		return
+// 	}
 
-	email := data["email"].(string)
-	Info.Println("email from request: ", email)
-	err, user := findUserByEmail(email)
-	if err != nil {
-		panic(err.Error())
-		Info.Println("error from find user by email: ", err.Error())
-		Info.Println("error from find user by email: ", err.Error())
-		http.Error(w, err.Error(), http.StatusNotFound)
-		return
-	}
-	// log.Fatalln("user from find user: ", user)
+// 	email := data["email"].(string)
+// 	Info.Println("email from request: ", email)
+// 	err, user := findUserByEmail(email)
+// 	if err != nil {
+// 		panic(err.Error())
+// 		Info.Println("error from find user by email: ", err.Error())
+// 		Info.Println("error from find user by email: ", err.Error())
+// 		http.Error(w, err.Error(), http.StatusNotFound)
+// 		return
+// 	}
+// 	// log.Fatalln("user from find user: ", user)
 
-	pwd := data["password"].(string)
+// 	pwd := data["password"].(string)
 
-	fmt.Println("password from request: ", pwd)
+// 	fmt.Println("password from request: ", pwd)
 
-	isMatch := comparePasswords(user.Password, pwd)
+// 	isMatch := comparePasswords(user.Password, pwd)
 
-	if isMatch == false {
-		responseWithJson(w, http.StatusUnauthorized, map[string]string{"message": "incorrect passwod"})
-		return
-	}
+// 	if isMatch == false {
+// 		responseWithJson(w, http.StatusUnauthorized, map[string]string{"message": "incorrect passwod"})
+// 		return
+// 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"username": user.Email,
-	})
-	// log.Fatalln("token from request: ", token)
+// 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+// 		"username": user.Email,
+// 	})
+// 	// log.Fatalln("token from request: ", token)
 
-	tokenString, error := token.SignedString([]byte("secret"))
-	if error != nil {
-		fmt.Println(error)
-	}
-	fmt.Println("token string from request: ", tokenString)
-	// json.NewEncoder(w).Encode(JwtToken{Token: tokenString})
+// 	tokenString, error := token.SignedString([]byte("secret"))
+// 	if error != nil {
+// 		fmt.Println(error)
+// 	}
+// 	fmt.Println("token string from request: ", tokenString)
+// 	// json.NewEncoder(w).Encode(JwtToken{Token: tokenString})
 
-	responseWithJson(w, http.StatusOK, map[string]string{"token": tokenString})
+// 	responseWithJson(w, http.StatusOK, map[string]string{"token": tokenString})
 
-}
+// }
 
 // <=============== Handlers ========================>
 
