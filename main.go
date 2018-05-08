@@ -2,8 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -11,12 +9,10 @@ import (
 	// _ "github.com/heroku/x/hmetrics/onload"
 
 	"github.com/gorilla/mux"
-	"golang.org/x/crypto/bcrypt"
 
 	// jwt "github.com/dgrijalva/jwt-go"
 
 	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 )
 
 // <=============== Model ========================>
@@ -26,10 +22,10 @@ import (
 // 	Password string `json:"password"`
 // }
 
-type UserDAO struct {
-	Server   string
-	Database string
-}
+// type UserDAO struct {
+// 	Server   string
+// 	Database string
+// }
 
 // <=============== Model ========================>
 
@@ -45,25 +41,20 @@ type ResponseParam struct {
 
 var (
 	ENCRYPT_KEY string
-	db          *mgo.Database
-	SERVER      string
 
 	Info *log.Logger
 )
 
 const (
-	COLLECTION = "user"
-	DATABASE   = "todoapp"
-	cost       = 10
+	cost = 10
 )
 
-func Init(infoHandle io.Writer) {
+func init() {
 	ENCRYPT_KEY = os.Getenv("ENCRYPT_KEY")
 	SERVER = os.Getenv("MLAB_URL")
-	// SERVER = "mongodb://duynguyen0428:cuongduy0428@ds221228.mlab.com:21228/todoapp"
-	Info = log.New(infoHandle,
-		"INFO: ",
-		log.Ldate|log.Ltime|log.Lshortfile)
+	// Info = log.New(infoHandle,
+	// 	"INFO: ",
+	// 	log.Ldate|log.Ltime|log.Lshortfile)
 
 	session, err := mgo.Dial(SERVER)
 	if err != nil {
@@ -74,13 +65,17 @@ func Init(infoHandle io.Writer) {
 
 func main() {
 
-	Init(os.Stdout)
+	// Init(os.Stdout)
 
 	router := mux.NewRouter()
 	router.Methods("GET").Path("/").HandlerFunc(IndexHandler)
 	router.Methods("GET").Path("/user").HandlerFunc(GetAllUsersHandler)
 	router.Methods("DELETE").Path("/user").HandlerFunc(RemoveUserHandler)
 
+	// router.Methods("GET").Path("/profile/{email}").HandlerFunc(RemoveUserHandler)
+
+	// router.Methods("GET").Path("/fotgotpassword).HandlerFunc(RemoveUserHandler)
+	// router.Methods("POST").Path("/fotgotpassword).HandlerFunc(RemoveUserHandler)
 	router.Methods("POST").Path("/register").HandlerFunc(CreatUserHandler)
 	router.Methods("POST").Path("/signin").HandlerFunc(SignInHandler)
 
@@ -88,14 +83,14 @@ func main() {
 	// http.HandleFunc("/favicon.ico", FaviconHandler)
 	// http.HandleFunc("/user", CreatUserHandler)
 	port := os.Getenv("PORT")
-	http.ListenAndServe(":"+port, router)
+	// http.ListenAndServe(":"+port, router)
 	// http.ListenAndServe(":8000", router)
 
-	// if port != "" {
-	// 	http.ListenAndServe(":"+port, router)
-	// } else {
-	// 	http.ListenAndServe(":8000", router)
-	// }
+	if &port != nil {
+		http.ListenAndServe(":"+port, router)
+	} else {
+		http.ListenAndServe(":8000", router)
+	}
 
 }
 
@@ -238,29 +233,29 @@ func FaviconHandler(w http.ResponseWriter, r *http.Request) {
 // 	}
 // 	db = session.DB(m.Database)
 // }
-func insertUser(user User) error {
-	err := db.C(COLLECTION).Insert(&user)
-	return err
-}
+// func insertUser(user User) error {
+// 	err := db.C(COLLECTION).Insert(&user)
+// 	return err
+// }
 
-func findAllUsers() (error, []User) {
-	var users []User
-	err := db.C(COLLECTION).Find(bson.M{}).All(&users)
-	return err, users
-}
+// func findAllUsers() (error, []User) {
+// 	var users []User
+// 	err := db.C(COLLECTION).Find(bson.M{}).All(&users)
+// 	return err, users
+// }
 
-func removeUser(user *User) error {
-	err := db.C(COLLECTION).Remove(user)
-	return err
-}
+// func removeUser(user *User) error {
+// 	err := db.C(COLLECTION).Remove(user)
+// 	return err
+// }
 
-func findUserByEmail(email string) (error, User) {
-	// Info.Println("email passed ", email)
-	var user User
-	err := db.C(COLLECTION).Find(bson.M{"email": email}).One(&user)
-	fmt.Println("Find user: ", user)
-	return err, user
-}
+// func findUserByEmail(email string) (error, User) {
+// 	// Info.Println("email passed ", email)
+// 	var user User
+// 	err := db.C(COLLECTION).Find(bson.M{"email": email}).One(&user)
+// 	fmt.Println("Find user: ", user)
+// 	return err, user
+// }
 
 // <=============== DAO ========================>
 
@@ -269,25 +264,25 @@ func findUserByEmail(email string) (error, User) {
 // <=============== Database ========================>
 
 // <=============== Ultility Functions ========================>
-func comparePasswords(hashedPwd string, plainPwd string) bool {
-	// Since we'll be getting the hashed password from the DB it
-	// will be a string so we'll need to convert it to a byte slice
-	bytePwd := []byte(plainPwd)
-	byteHash := []byte(hashedPwd)
-	err := bcrypt.CompareHashAndPassword(byteHash, bytePwd)
-	if err != nil {
-		log.Println(err)
-		return false
-	}
+// func comparePasswords(hashedPwd string, plainPwd string) bool {
+// 	// Since we'll be getting the hashed password from the DB it
+// 	// will be a string so we'll need to convert it to a byte slice
+// 	bytePwd := []byte(plainPwd)
+// 	byteHash := []byte(hashedPwd)
+// 	err := bcrypt.CompareHashAndPassword(byteHash, bytePwd)
+// 	if err != nil {
+// 		log.Println(err)
+// 		return false
+// 	}
 
-	return true
-}
+// 	return true
+// }
 
-func responseWithJson(w http.ResponseWriter, reponsecode int, i interface{}) {
-	response, _ := json.Marshal(i)
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	// json.NewEncoder(w).Encode(i)
-	w.Write(response)
-	return
-}
+// func responseWithJson(w http.ResponseWriter, reponsecode int, i interface{}) {
+// 	response, _ := json.Marshal(i)
+// 	w.Header().Set("Content-Type", "application/json")
+// 	w.WriteHeader(http.StatusOK)
+// 	// json.NewEncoder(w).Encode(i)
+// 	w.Write(response)
+// 	return
+// }

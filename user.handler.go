@@ -4,11 +4,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 )
+
+var (
+	service *UserDAO
+)
+
+func init() {
+	service.Connect()
+}
 
 func CreatUserHandler(w http.ResponseWriter, r *http.Request) {
 	// fmt.Print(w, "Hello There")
@@ -20,10 +29,22 @@ func CreatUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	err, existUser := service.findUserByEmail(user.Email)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if &existUser != nil {
+		fmt.Println("existing User: ", existUser)
+		responseWithJson(w, http.StatusCreated, map[string]string{"message": "user existed"})
+		return
+	}
+
 	pwd := []byte(user.Password)
 	hassPassword, err := bcrypt.GenerateFromPassword(pwd, cost)
 	user.Password = string(hassPassword)
-	if er := insertUser(user); er != nil {
+	if er := service.insertUser(user); er != nil {
 		http.Error(w, er.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -51,12 +72,12 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	email := data["email"].(string)
-	Info.Println("email from request: ", email)
-	err, user := findUserByEmail(email)
+	fmt.Println("email from request: ", email)
+	err, user := service.findUserByEmail(email)
 	if err != nil {
-		panic(err.Error())
-		Info.Println("error from find user by email: ", err.Error())
-		Info.Println("error from find user by email: ", err.Error())
+		// panic(err.Error())
+		// Info.Println("error from find user by email: ", err.Error())
+		// Info.Println("error from find user by email: ", err.Error())
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
@@ -91,7 +112,7 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 
 func GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	// fmt.Print(w, "Hello There")
-	err, users := findAllUsers()
+	err, users := service.findAllUsers()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -111,7 +132,7 @@ func RemoveUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = removeUser(&user)
+	err = service.removeUser(&user)
 	// data, err := json.Marshal(users)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -119,5 +140,28 @@ func RemoveUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responseWithJson(w, http.StatusOK, map[string]string{"message": "removed"})
+	return
+}
+
+func comparePasswords(hashedPwd string, plainPwd string) bool {
+	// Since we'll be getting the hashed password from the DB it
+	// will be a string so we'll need to convert it to a byte slice
+	bytePwd := []byte(plainPwd)
+	byteHash := []byte(hashedPwd)
+	err := bcrypt.CompareHashAndPassword(byteHash, bytePwd)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+
+	return true
+}
+
+func responseWithJson(w http.ResponseWriter, reponsecode int, i interface{}) {
+	response, _ := json.Marshal(i)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	// json.NewEncoder(w).Encode(i)
+	w.Write(response)
 	return
 }
