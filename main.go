@@ -74,6 +74,7 @@ func main() {
 
 	// router.Methods("GET").Path("/profile/{email}").HandlerFunc(RemoveUserHandler)
 
+	// router.Methods("POST").Path("/updatepassword).HandlerFunc(RemoveUserHandler)
 	// router.Methods("GET").Path("/fotgotpassword).HandlerFunc(RemoveUserHandler)
 	// router.Methods("POST").Path("/fotgotpassword).HandlerFunc(RemoveUserHandler)
 	router.Methods("POST").Path("/register").HandlerFunc(CreatUserHandler)

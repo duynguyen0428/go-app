@@ -20,6 +20,7 @@ type UserService interface {
 	insertUser(user User) error
 	removeUser(user *User) error
 	findUserByEmail(email string) (error, User)
+	updateUserPassword(email string, pwd string) error
 }
 
 var (
@@ -80,4 +81,11 @@ func (userivce *UserDAO) findUserByEmail(email string) (error, User) {
 	err := db.C(COLLECTION).Find(bson.M{"email": email}).One(&user)
 	fmt.Println("Find user: ", user)
 	return err, user
+}
+
+func (userivce *UserDAO) updateUserPassword(email string, pwd string) error {
+	selector := bson.M{"email": email}
+	updator := bson.M{"$set": bson.M{"password": pwd}}
+	err := db.C(COLLECTION).Update(selector, updator)
+	return err
 }

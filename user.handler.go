@@ -143,6 +143,55 @@ func RemoveUserHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func ChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
+	data := make(map[string]interface{})
+
+	b, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	// unmarschal JSON
+	err = json.Unmarshal(b, &data)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	email := data["email"].(string)
+	fmt.Println("email from request: ", email)
+	// err, user := service.findUserByEmail(email)
+	// if err != nil {
+	// 	// panic(err.Error())
+	// 	// Info.Println("error from find user by email: ", err.Error())
+	// 	// Info.Println("error from find user by email: ", err.Error())
+	// 	http.Error(w, err.Error(), http.StatusNotFound)
+	// 	return
+	// }
+	// log.Fatalln("user from find user: ", user)
+
+	pwd := data["password"].(string)
+
+	fmt.Println("password from request: ", pwd)
+
+	err = service.updateUserPassword(email, pwd)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	responseWithJson(w, http.StatusOK, map[string]string{"message": "change password completed"})
+}
+
+func ForgotPasswordHandler(w http.ResponseWriter, r *http.Request) {
+	// var user User
+	// err := json.NewDecoder(r.Body).Decode(&user)
+}
+
 func comparePasswords(hashedPwd string, plainPwd string) bool {
 	// Since we'll be getting the hashed password from the DB it
 	// will be a string so we'll need to convert it to a byte slice
