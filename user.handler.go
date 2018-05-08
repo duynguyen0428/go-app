@@ -175,9 +175,11 @@ func ChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 
 	pwd := data["password"].(string)
 
+	bytepwd := []byte(pwd)
+	hassPassword, err := bcrypt.GenerateFromPassword(bytepwd, cost)
 	fmt.Println("password from request: ", pwd)
 
-	err = service.updateUserPassword(email, pwd)
+	err = service.updateUserPassword(email, string(hassPassword))
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
