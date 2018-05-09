@@ -190,8 +190,38 @@ func ChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ForgotPasswordHandler(w http.ResponseWriter, r *http.Request) {
-	// var user User
-	// err := json.NewDecoder(r.Body).Decode(&user)
+	// get email from request
+	data := make(map[string]interface{})
+
+	b, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	// unmarschal JSON
+	err = json.Unmarshal(b, &data)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	email := data["email"].(string)
+	fmt.Println("email from request: ", email)
+	// check if user exists
+	err, user := service.findUserByEmail(email)
+	if err != nil {
+		// panic(err.Error())
+		// Info.Println("error from find user by email: ", err.Error())
+		// Info.Println("error from find user by email: ", err.Error())
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	fmt.Println("user from find user: ", user)
+	// if yes -> send email confirm with embbed encrypted link
+	//
 }
 
 func comparePasswords(hashedPwd string, plainPwd string) bool {
